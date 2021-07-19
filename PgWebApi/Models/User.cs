@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace PgWebApi.Models
 {
 	public class User

@@ -31,7 +31,9 @@ namespace PgWebApi
 				c.SwaggerDoc("v1", new OpenApiInfo { Title = "PgWebApi", Version = "v1" });
 			});
 			
-			services.AddSingleton<IUserRepo>(s => new UserRepo(Configuration));
+			var pgSettings = Configuration.GetSection(nameof(PgSettings)).Get<PgSettings>();
+
+			services.AddSingleton<IUserRepo>(s => new UserRepo(pgSettings.ConnectionString));
 
 		}
 

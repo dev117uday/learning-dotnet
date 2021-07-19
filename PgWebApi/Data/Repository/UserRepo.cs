@@ -11,13 +11,12 @@ namespace PgWebApi.Data
 {
 	public class UserRepo : IUserRepo
 	{
-		static private IDbConnection db;
+		private static IDbConnection _db;
 
-		public UserRepo(IConfiguration configuration)
+		public UserRepo(string cs)
 		{
-			var pgSettings = configuration.GetSection(nameof(PgSettings)).Get<PgSettings>();
-			db = new NpgsqlConnection(pgSettings.ConnectionString);
-			db.Open();
+			_db = new NpgsqlConnection(cs);
+			_db.Open();
 		}
 
 		public async Task<User> CreateUser(User user)
@@ -25,7 +24,7 @@ namespace PgWebApi.Data
 			var sql = @"INSERT INTO users (name, email) 
                             values ( @UserName, @UserEmail) returning id";
 
-			var result = await db.QueryFirstOrDefaultAsync<int>(sql,
+			var result = await _db.QueryFirstOrDefaultAsync<int>(sql,
 				new { UserName = user.Name, UserEmail = user.Email });
 			user.Id = result;
 
@@ -35,7 +34,7 @@ namespace PgWebApi.Data
 		public async Task<bool> DeleteUser(int userId)
 		{
 			var sql = @"DELETE FROM users WHERE id = @Id";
-			var affectedRows = await db.ExecuteAsync(sql, new { Id = userId });
+			var affectedRows = await _db.ExecuteAsync(sql, new { Id = userId });
 			if (affectedRows == 1)
 			{
 				return true;
@@ -46,7 +45,7 @@ namespace PgWebApi.Data
 
 		public async Task<User> GetUserById(int userId)
 		{
-			User result1 = await db.QueryFirstOrDefaultAsync<User>("SELECT * FROM users WHERE id = @Id;",
+			User result1 = await _db.QueryFirstOrDefaultAsync<User>("SELECT * FROM users WHERE id = @Id;",
 				new { Id = userId });
 			return result1;
 		}
@@ -56,7 +55,7 @@ namespace PgWebApi.Data
 			var sql = @"UPDATE users 
                 SET name = @UserName, email = @UserEmail 
                 WHERE id = @UserId;";
-			var result = await db.ExecuteAsync(sql,
+			var result = await _db.ExecuteAsync(sql,
 				new { UserName = user.Name, UserEmail = user.Email, UserId = user.Id });
 			if (result == 1)
 			{
