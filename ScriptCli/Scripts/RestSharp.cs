@@ -8,7 +8,7 @@ namespace ScriptCli
 {
 	class RestSharp
 	{
-		static void Resquest(string[] args)
+		static void Request(string[] args)
 		{
 			var client = new RestClient("");
 			client.Timeout = -1;
