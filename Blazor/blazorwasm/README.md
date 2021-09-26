@@ -1,2 +1,0 @@
-# learning-blazor
-Learning BlazorWASM
